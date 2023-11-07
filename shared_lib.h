@@ -11,7 +11,7 @@
 #define KEY (key_t) 1234 // msg key
 
 struct msg_data{
-    long int msg_key;
+    long int pid;
     char data[BUFFER_SIZE];
 };
 

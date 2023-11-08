@@ -2,14 +2,12 @@
 
 // msg_get() -> returns msgqid
 int message_get(){
-    int msgqid = msgget(KEY, 0666 | IPC_CREAT);
+    int msgqid = msgget(QUEUE_KEY, QUEUE_PERMISSION);
 
     if(msgqid == -1){
         perror("msgget failure\n");
         exit(EXIT_FAILURE);
     }
-
-    printf("server online and accepting requests...\n");
     return msgqid;
 }
 
@@ -18,7 +16,7 @@ void message_send(struct msg_data* data){
     int msgqid = message_get();
     char temp_data[BUFFER_SIZE];
 
-    printf("SENDING TO (CLIENT_PID %d): ", data->pid);
+    printf("SENDING TO (CLIENT_PID %d): ", data->client_pid);
     fgets(temp_data, BUFFER_SIZE, stdin);
     strcpy(data->data, temp_data);
 
@@ -29,20 +27,19 @@ void message_send(struct msg_data* data){
 }
 
 // msg_rcv() -> # bytes received or -1
-void message_receive(struct msg_data *data, int* msg_key){
+void message_receive(struct msg_data *data){
     int msgqid = message_get();
 
     // make changes to msg_key to properply function request-response model
-    if(msgrcv(msgqid, (void*) data, sizeof(*data), *msg_key, 0) == -1){
+    if(msgrcv(msgqid, (void*) data, sizeof(*data), data->msg_type, 0) == -1){
         perror("msgrcv failed\n");
         exit(EXIT_FAILURE);
     }
-    printf("RECEIVED FROM (CLIENT_PID %d): %s\n", data->pid, data->data);
+    printf("RECEIVED FROM (CLIENT_PID %d): %s\n", data->msg_type, data->data);
 }
 
 int main(){
     int running = 1;
-    int msg_key = 0; // this is complicated a little
     int msgqid;
 
     struct msg_data data;
@@ -51,10 +48,13 @@ int main(){
     msgqid = message_get();
 
     while(running){
+        
         // handle request first
-        message_receive(&data, &msg_key);
+        data.msg_type = 1; // server receives all type 1
+        message_receive(&data); // data.msg_type now holds the client's pid
 
         // respond now
+        data.msg_type = data.client_pid; // send to client that sent the request
         message_send(&data);
 
         // end if "end" typed

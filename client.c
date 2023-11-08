@@ -1,14 +1,3 @@
-/* 
-    Author: Arun Karki 
-
-    Student ID: 101219923
-
-    Date: Nov 8, 2023
-
-*/
-
-
-// test push
 #include "shared_lib.h"
 
 // msg_get() -> returns msgqid
@@ -27,10 +16,8 @@ void message_send(struct msg_data* data){
     int msgqid = message_get();
     char temp_data[BUFFER_SIZE];
 
-    printf("SENDING TO (SERVER): ");
+    sprintf(data->message, "REQUEST;semS"); // this is the request message being sent to the server
 
-    fgets(temp_data, BUFFER_SIZE, stdin);
-    strcpy(data->data, temp_data);
     data->client_pid = getpid(); // server will use this to write back
 
     if(msgsnd(msgqid, (void*) data, sizeof(*data), 0) == -1){
@@ -48,33 +35,30 @@ void message_receive(struct msg_data *data){
         exit(EXIT_FAILURE);
     }
 
-    printf("RECEIVED FROM (SERVER): %s", data->data);
+    char response[BUFFER_SIZE];
+    int key;
+
+    sscanf(data->message, "RESPONSE;%[^;];%d", response, &key);
+    printf("CLIENT RECEIVED:\n");
+    printf("data->message: %s\n",data->message);
+    printf("response: %s\n", response);
+    printf("key: %d\n", key);
 }
 
 int main(){
 
-    printf("CLIENT_PID: %d\n", getpid());
-    int running = 1;
     int msgqid;
     struct msg_data data;
-    char buffer[BUFFER_SIZE];
-
+    
     msgqid = message_get();
 
-    while(running){
-        
-        // respond now
-        data.msg_type = SERVER_MSG_TYPE; // send a type 1 for server to read
-        message_send(&data);
+    // respond now
+    data.msg_type = SERVER_MSG_TYPE; // send a type 1 for server to read
+    message_send(&data);
 
-        // handle request first
-        data.msg_type = getpid(); // receive to client that sent the request
-        message_receive(&data);
+    // handle request first
+    data.msg_type = getpid(); // receive to client that sent the request
+    message_receive(&data);
 
-        // end if "end" typed
-        if(strncmp(data.data, "end", 3) == 0 || strncmp(buffer, "end", 3) == 0){
-            running = 0;
-        }
-    }
     return 0;
 }

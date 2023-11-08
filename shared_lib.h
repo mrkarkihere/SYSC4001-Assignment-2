@@ -1,3 +1,12 @@
+/* 
+    Author: Arun Karki 
+
+    Student ID: 101219923
+
+    Date: Nov 8, 2023
+
+*/
+
 #ifndef SHARED_LIB_H
 #define SHARED_LIB_H
 

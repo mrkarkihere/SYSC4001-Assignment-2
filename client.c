@@ -1,3 +1,5 @@
+// consumer
+
 #include "shared_lib.h"
 
 // msg_get() -> returns msgqid

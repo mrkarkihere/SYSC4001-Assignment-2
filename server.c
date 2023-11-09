@@ -1,4 +1,16 @@
 #include "shared_lib.h"
+#include <time.h>
+
+// global variables
+key_t shm_key = -1;
+key_t sem_key = -1;
+
+// generate a random key
+int generate_key(){
+    printf("generating a key...\n");
+    srand(time(NULL));
+    return rand() % (9999 - 1000 + 1) + 1000;
+}
 
 // msg_get() -> returns msgqid
 int message_get(){
@@ -12,11 +24,18 @@ int message_get(){
 }
 
 // msg_snd() -> -1 or 0
-void message_send(struct msg_data* data){
+void message_send(struct msg_data* data, char* request){
     int msgqid = message_get();
     char temp_data[BUFFER_SIZE];
 
-    sprintf(data->message, "RESPONSE;semS;1234");
+
+    // check to see if requested shared memory key
+    if(strncmp(request, SH_MEM_REQ_MSG, strlen(request)) == 0){
+
+        // if key is -1 then generate a key
+        if(shm_key == -1) shm_key = generate_key();
+        sprintf(data->message, "RESPONSE;%d", shm_key);
+    }
 
     if(msgsnd(msgqid, (void*) data, sizeof(*data), 0) == -1){
         perror("msgsnd failed\n");
@@ -25,7 +44,7 @@ void message_send(struct msg_data* data){
 }
 
 // msg_rcv() -> # bytes received or -1
-void message_receive(struct msg_data *data){
+void message_receive(struct msg_data *data, char* request){
     int msgqid = message_get();
 
     // make changes to msg_key to properply function request-response model
@@ -34,11 +53,8 @@ void message_receive(struct msg_data *data){
         exit(EXIT_FAILURE);
     }
 
-    char request[BUFFER_SIZE]; // whats the request; sem or key, etc... ex 'semS'
     sscanf(data->message, "REQUEST;%s", request); // i guess it stores it here now? i dont really get it atm
 
-    printf("SERVER RECEIVED:\n");
-    printf("data->message: %s\n",data->message);
     printf("request: %s\n", request);
 }
 
@@ -46,19 +62,22 @@ int main(){
 
     int msgqid;
     struct msg_data data;
+    char request[BUFFER_SIZE]; // what type of request is being made
 
     msgqid = message_get();
 
+    //while(1){
     // handle request first
     data.msg_type = 1; // server receives all type 1
-    message_receive(&data); // data.msg_type now holds the client's pid
+    message_receive(&data, &request); // data.msg_type now holds the client's pid
 
     // respond now
     data.msg_type = data.client_pid; // send to client that sent the request
-    message_send(&data);
-
-    sleep(1);
+    message_send(&data, &request);
+    //}
+    
     // remove queue
+    sleep(1);
     msgctl(msgqid, IPC_RMID, 0);
 
     return 0;

@@ -12,10 +12,12 @@
 #define QUEUE_PERMISSION 0666 | IPC_CREAT
 #define SERVER_MSG_TYPE 1;
 
+#define SH_MEM_REQ_MSG "sh_key"
+
 struct msg_data{
     long int msg_type;
     pid_t client_pid;
-    char message[BUFFER_SIZE];
+    char message[BUFFER_SIZE]; // lets try to put the keys in here
 };
 
 #endif

@@ -1,5 +1,3 @@
-// consumer
-
 #include "shared_lib.h"
 
 // msg_get() -> returns msgqid
@@ -14,11 +12,11 @@ int message_get(){
 }
 
 // msg_snd() -> -1 or 0
-void message_send(struct msg_data* data){
+void message_send(struct msg_data* data, char* request){
     int msgqid = message_get();
     char temp_data[BUFFER_SIZE];
 
-    sprintf(data->message, "REQUEST;semS"); // this is the request message being sent to the server
+    sprintf(data->message, request); // this is the request message being sent to the server
 
     data->client_pid = getpid(); // server will use this to write back
 
@@ -29,7 +27,7 @@ void message_send(struct msg_data* data){
 }
 
 // msg_rcv() -> # bytes received or -1
-void message_receive(struct msg_data *data){
+key_t message_receive(struct msg_data *data){
     int msgqid = message_get();
 
     if(msgrcv(msgqid, (void*) data, sizeof(*data), data->msg_type, 0) == -1){
@@ -37,30 +35,30 @@ void message_receive(struct msg_data *data){
         exit(EXIT_FAILURE);
     }
 
-    char response[BUFFER_SIZE];
-    int key;
+    int key; // response sent from server
+    sscanf(data->message, "RESPONSE;%d", &key);
 
-    sscanf(data->message, "RESPONSE;%[^;];%d", response, &key);
-    printf("CLIENT RECEIVED:\n");
-    printf("data->message: %s\n",data->message);
-    printf("response: %s\n", response);
-    printf("key: %d\n", key);
+    printf("key received: %d\n", key);
+    return (key_t) key;
 }
 
 int main(){
 
     int msgqid;
     struct msg_data data;
-    
+    key_t shm_key, sem_key;
+    char request[BUFFER_SIZE]; // what type of request am i making
+
     msgqid = message_get();
 
-    // respond now
+    // request for shared memory key from server
     data.msg_type = SERVER_MSG_TYPE; // send a type 1 for server to read
-    message_send(&data);
+    sprintf(request, "REQUEST;sh_key");
+    message_send(&data, &request);
 
-    // handle request first
+    // shared memory key received from server
     data.msg_type = getpid(); // receive to client that sent the request
-    message_receive(&data);
-
+    shm_key = message_receive(&data);
+    
     return 0;
 }

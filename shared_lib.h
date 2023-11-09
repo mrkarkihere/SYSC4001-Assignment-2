@@ -6,18 +6,31 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/msg.h>
+#include <sys/shm.h>
 
 #define BUFFER_SIZE 512
+#define SHM_BUFFER_SIZE 1024
+
 #define QUEUE_KEY (key_t) 6666 // msg queue
-#define QUEUE_PERMISSION 0666 | IPC_CREAT
 #define SERVER_MSG_TYPE 1;
+#define NUM_BUFFER 2 // making N buffers in memory
+
+#define QUEUE_PERMISSION 0666 | IPC_CREAT
+#define SHM_PERMISSION 0666 | IPC_CREAT
 
 #define SH_MEM_REQ_MSG "sh_key"
+#define SEM_REQ_MSG "sem_key"
 
 struct msg_data{
     long int msg_type;
     pid_t client_pid;
     char message[BUFFER_SIZE]; // lets try to put the keys in here
+};
+
+struct shm_buffer{
+    char message[SHM_BUFFER_SIZE];
+    int sequence_number;
+    int count;
 };
 
 #endif

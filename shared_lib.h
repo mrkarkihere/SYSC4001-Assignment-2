@@ -7,19 +7,28 @@
 #include <unistd.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
+#include "semun.h"
 
 #define BUFFER_SIZE 512
 #define SHM_BUFFER_SIZE 1024
 
 #define QUEUE_KEY (key_t) 6666 // msg queue
-#define SERVER_MSG_TYPE 1;
+#define SERVER_MSG_TYPE 1
 #define NUM_BUFFER 10 // making N buffers in memory
+#define NUM_SEMAPHORE 3 // make 3 semaphores (0: Empty, 1: Full, 2: Mutex [0 = Producer, 1 = Consumer])
 
 #define QUEUE_PERMISSION 0666 | IPC_CREAT
 #define SHM_PERMISSION 0666 | IPC_CREAT
+#define SEM_PERMISSION 0666 | IPC_CREAT
 
 #define SH_MEM_REQ_MSG "sh_key"
 #define SEM_REQ_MSG "sem_key"
+
+// semaphore functions
+static int set_semvalue(key_t* sem_id);
+static void del_semvalue(key_t* sem_id);
+static int semaphore_p(key_t* sem_id, int sem_num);
+static int semaphore_v(key_t* sem_id, int sem_num);
 
 struct msg_data{
     long int msg_type;

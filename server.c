@@ -3,7 +3,7 @@
 
 // global variables
 key_t shm_key = -1;
-key_t sem_key = -1;
+key_t sem_key = -1; // number of empty buffers
 
 // generate a random key
 int generate_key(){

@@ -72,9 +72,8 @@ key_t get_shared_mem(key_t *shm_key){
     return shmid;
 }
 // attach to the shared memory region
-void attach_shared_mem(key_t* shmid, void* shm_ptr){
-    printf("shmid: %d\n", *shmid);
-    shm_ptr = shmat(*shmid, (void *)0, 0);
+void attach_shared_mem(key_t* shmid, void** shm_ptr){
+    *shm_ptr = shmat(*shmid, (void *)0, 0);
     if (shm_ptr == (void *)-1){
         fprintf(stderr, "shmat failed\n");
         exit(EXIT_FAILURE);
@@ -97,13 +96,14 @@ int main(){
 
     /* REQUEST SHARED MEMORY KEY */
     shm_key = get_shm_key(&data, &request);
-    attach_shared_mem(&shmid, shm_ptr);
-    shared_memory = (struct shm_buffer *) shm_ptr;
+    shmid = get_shared_mem(&shm_key); //create or get shared memory
+    attach_shared_mem(&shmid, &shm_ptr); // attach to ptr
+    shared_memory = (struct shm_buffer *) shm_ptr; // assign to buffer
 
     printf("Shared Memory Key: %d\n", shm_key);
     printf("Shared Memory ID: %d\n", shmid);
-    printf("Shared Memory Address: %X\n", (int) shm_ptr);
-
+    printf("Shared Memory Address: %d\n", (int) shm_ptr);
+    printf("or like this? %p\n", shm_ptr);
 
     /* REQUEST SEMAPHORE KEY */
     sem_key = get_sem_key(&data, &request);

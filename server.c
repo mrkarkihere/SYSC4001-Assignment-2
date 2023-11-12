@@ -1,5 +1,6 @@
 #include "shared_lib.h"
 #include <time.h>
+#include <sys/stat.h>
 
 // global variables
 key_t shm_key = -1;
@@ -25,7 +26,8 @@ int message_get(){
 void message_send(struct msg_data* data, char* request){
 
     int msgqid = message_get();
-    char temp_data[BUFFER_SIZE];
+    char file_name[BUFFER_SIZE];
+    sscanf(data->message, "REQUEST;%[^;];%s", request, file_name); // get file name if it exists
 
     // check to see if requested shared memory key
     if(strncmp(request, SH_MEM_REQ_MSG, strlen(request)) == 0){
@@ -40,6 +42,12 @@ void message_send(struct msg_data* data, char* request){
         if(sem_key == -1) sem_key = generate_key();
         sprintf(data->message, "RESPONSE;%d", sem_key);
         printf("sem_key: %d\n", sem_key);
+        
+    // check to see if requested file size
+    }else if(strncmp(request, FILE_SIZE_REQ_MSG, strlen(request)) == 0){
+        struct stat file_info;
+        stat(file_name, &file_info); // read info using file_name
+        sprintf(data->message, "RESPONSE;%d", (int) file_info.st_size);
     }
 
     if(msgsnd(msgqid, (void*) data, sizeof(*data), 0) == -1){

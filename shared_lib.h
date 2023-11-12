@@ -7,10 +7,11 @@
 #include <unistd.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
+#include <fcntl.h>
 #include "semun.h"
 
 #define BUFFER_SIZE 512
-#define SHM_BUFFER_SIZE 1024
+#define SHM_BUFFER_SIZE 2//1024
 
 #define QUEUE_KEY (key_t) 6666 // msg queue
 #define SERVER_MSG_TYPE 1
@@ -21,6 +22,7 @@
 #define SHM_PERMISSION 0666 | IPC_CREAT
 #define SEM_PERMISSION 0666 | IPC_CREAT
 
+#define FILE_SIZE_REQ_MSG "file_size"
 #define SH_MEM_REQ_MSG "sh_key"
 #define SEM_REQ_MSG "sem_key"
 

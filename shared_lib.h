@@ -24,6 +24,7 @@
 #define SH_MEM_REQ_MSG "sh_key"
 #define SEM_REQ_MSG "sem_key"
 
+
 // semaphore functions
 static int set_semvalue(key_t* sem_id);
 static void del_semvalue(key_t* sem_id);

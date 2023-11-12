@@ -1,4 +1,5 @@
 #include "shared_lib.h"
+#include <fcntl.h>
 
 // msg_get() -> returns msgqid
 int message_get(){
@@ -139,7 +140,13 @@ static int semaphore_v(key_t* sem_id, int sem_num){
     return (1);
 }
 
+
+// maybe use command line arguments for file name -> good idea
+
 int main(){
+
+    FILE* input_file;
+    char* input_file_name = "input";
 
     int msgqid; // queue message id
     struct msg_data data; // queue data struct
@@ -174,6 +181,42 @@ int main(){
     printf("Semaphore Key: %d\n", sem_key);
     printf("Semaphore ID: %d\n", sem_id);
     */
+
+
+
+/*
+    WRITE TO BUFFER EXAMPLE:
+
+
+    sprintf(shared_memory[0].message, "hi test");
+    printf("%s\n", shared_memory[0].message);
+ */
+
+    // read from input file and write to buffer
+    input_file = open(input_file_name, O_RDONLY);
+
+    if(input_file == -1){
+        perror("error opening input file");
+        exit(EXIT_FAILURE);
+    }
+
+
+    // loop thru all buffers
+    for(int i = 0; i < NUM_BUFFER; i++){
+
+    }
+    
+    char* ptr = shared_memory[0].message;
+    int bytesRead;
+    int totalBytesRead = 0;
+
+    // read from file
+    while ((bytesRead = read(input_file, ptr, sizeof(ptr))) > 0) {
+        printf("%s", ptr);
+        totalBytesRead += bytesRead;
+    }
+
+    printf("bytes read: %d\n", totalBytesRead);
 
     // clean up process
     del_semvalue(&sem_id);

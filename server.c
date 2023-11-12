@@ -3,12 +3,10 @@
 
 // global variables
 key_t shm_key = -1;
-key_t sem_key = -1; // number of empty buffers
+key_t sem_key = -1;
 
 // generate a random key
 int generate_key(){
-    printf("generating a key...\n");
-    //srand(time(NULL));
     return rand() % (9999 - 1000 + 1) + 1000;
 }
 

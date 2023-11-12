@@ -12,7 +12,7 @@
 #include "semun.h"
 
 #define BUFFER_SIZE 512
-#define SHM_BUFFER_SIZE 2//1024
+#define SHM_BUFFER_SIZE 1024
 
 #define QUEUE_KEY (key_t) 6666 // msg queue
 #define SERVER_MSG_TYPE 1
@@ -46,8 +46,6 @@ struct shm_buffer{
     int sequence_number; // basically says  where im at reading/writing in total
     int count; // how much bytes im reading/writing in the buffer
 };
-
-// NOTE: TRY WITH IMAGE FILE AT THE END
 
 #endif
 

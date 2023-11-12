@@ -14,9 +14,8 @@ int message_get(){
 // msg_snd() -> -1 or 0
 void message_send(struct msg_data* data, char* request){
     int msgqid = message_get();
-    char temp_data[BUFFER_SIZE];
 
-    sprintf(data->message, request); // this is the request message being sent to the server
+    sprintf(data->message, "%s", request); // this is the request message being sent to the server
 
     data->client_pid = getpid(); // server will use this to write back
 
@@ -110,11 +109,10 @@ static int semaphore_v(key_t* sem_id, int sem_num){
 // maybe use command line arguments for file name -> good idea
 int main(int argc, char *argv[]){
 
-    printf("\n---- CONSUMER ----\n");
+    printf("\n---------| PRODUCER |---------\n");
 
-    //
     char* output_file_name = "output.txt"; // temporary
-    FILE* output_file;   
+    int output_file;   
 
     int msgqid; // queue message id
     struct msg_data data; // queue data struct
@@ -140,7 +138,7 @@ int main(int argc, char *argv[]){
 
     printf("Shared Memory Key: %d\n", shm_key);
     printf("Shared Memory ID: %d\n", shm_id);
-    printf("Shared Memory Address: %d\n", (int) shm_ptr);    
+    printf("Shared Memory Address: %p\n", shm_ptr);    
 
     /* REQUEST SEMAPHORE KEY */
     sem_key = get_sem_key(&data, &request);
@@ -177,7 +175,7 @@ int main(int argc, char *argv[]){
                 perror("ERROR: unexpected sequence number\n");
 
             // read contents of buffer[i] and put into output file
-            bytesWritten += write(output_file, curr_buff->message, strlen(curr_buff));
+            bytesWritten += write(output_file, curr_buff->message, strlen(curr_buff->message));
 
             // signal()
             semaphore_v(&sem_id, 2); // signal on Mutex (S)
@@ -196,5 +194,6 @@ int main(int argc, char *argv[]){
     semaphore_v(&sem_id, 3); // signal on Destroy
     message_send(&data, TERMINATION_CODE); // send server to destroy
     msgctl(msgqid, IPC_RMID, NULL); // close queue
+    
     return 0;
 }

@@ -79,14 +79,14 @@ int message_receive(struct msg_data *data, char* request){
 
 int main(){
 
-    printf("\n---- SERVER ----\n");
+    printf("\n---------| SERVER |---------\n");
 
     srand(time(NULL)); // seed
 
     int running = 1;
     int msgqid;
     struct msg_data data;
-    char request[BUFFER_SIZE]; // what type of request is being made
+    char request; // what type of request is being made
 
     msgqid = message_get();
 

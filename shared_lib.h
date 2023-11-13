@@ -23,7 +23,7 @@
 #define QUEUE_KEY (key_t) 6666 // msg queue
 #define SERVER_MSG_TYPE 1
 #define NUM_BUFFER 10 // making N buffers in memory
-#define NUM_SEMAPHORE 3 // make 3 semaphores (0: Empty, 1: Full, 2: Mutex, 3: Destroy)
+#define NUM_SEMAPHORE 4 // make 3 semaphores (0: Empty, 1: Full, 2: Mutex, 3: Destroy)
 
 #define QUEUE_PERMISSION 0666 | IPC_CREAT
 #define SHM_PERMISSION 0666 | IPC_CREAT

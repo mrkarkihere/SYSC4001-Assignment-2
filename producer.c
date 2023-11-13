@@ -61,6 +61,7 @@ size_t get_input_file_size(struct msg_data* data, char* request, char* file_name
     data->msg_type = SERVER_MSG_TYPE; // send a type 1 for server to read
     sprintf(request, "REQUEST;%s;%s", FILE_SIZE_REQ_MSG, file_name);
     message_send(data, request);
+    
     // file size received from server
     data->msg_type = getpid(); // receive to client that sent the request
     
@@ -181,9 +182,9 @@ int main(int argc, char *argv[]){
     printf("\n---------| PRODUCER |---------\n");
 
     //
-    char* input_file_name = "input.txt";
+    char input_file_name[BUFFER_SIZE] = "input.txt";
     int input_file;   
-    int input_file_size;
+    size_t input_file_size;
 
     int msgqid; // queue message id
     struct msg_data data; // queue data struct
@@ -232,10 +233,10 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-
     /* READ from input file and put into buffer(s) */
     // no need to loop thru all, calculate how many buffers are needed by (file size/size of each buffer) and round up
-
+    input_file_size = get_input_file_size(&data, &request,  input_file_name);
+    
     int totalBytes = 0;
     for(int i = 0; i < (int) ceil(((double) input_file_size/SHM_BUFFER_SIZE)); i++){
 
@@ -247,9 +248,9 @@ int main(int argc, char *argv[]){
         semaphore_p(&sem_id, 2); // wait on Mutex (S)
 
         printf("Reading from %s and writing to Buffer[%d]...\n", input_file_name, i);
-        
+
         // while buffer not full and im reading bytes from file:
-        while(curr_buff->count < SHM_BUFFER_SIZE && (bytesRead = read(input_file, curr_buff->message, sizeof(curr_buff->message))) > 0){
+        while(curr_buff->count < SHM_BUFFER_SIZE && (bytesRead = read(input_file, curr_buff->message, strlen(curr_buff->message))) > 0){
             curr_buff->count += bytesRead; // # of bytes written in the buffer
         }
 

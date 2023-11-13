@@ -118,7 +118,7 @@ int main(int argc, char *argv[]){
 
     printf("\n---------| PRODUCER |---------\n");
 
-    char* output_file_name = "output.txt"; // temporary
+    char output_file_name[BUFFER_SIZE] = "output.txt"; 
     int output_file;   
 
     int msgqid; // queue message id
@@ -169,13 +169,13 @@ int main(int argc, char *argv[]){
         struct shm_buffer* curr_buff = &shared_memory[i]; // current buffer
 
         if(curr_buff->count > 0){ // there's stuff to retrieve
-
-            // empty the buffer
-            curr_buff->count = 0;
-
+        
             // wait()
             semaphore_p(&sem_id, 1); // wait on Full (N)
             semaphore_p(&sem_id, 2); // wait on Mutex (S)
+
+            // empty the buffer
+            curr_buff->count = 0;
 
             // verify sequenceNumber
             if(bytesWritten != curr_buff->sequence_number)

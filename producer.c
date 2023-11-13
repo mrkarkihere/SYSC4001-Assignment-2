@@ -6,6 +6,7 @@
  */
 
 #include "shared_lib.h"
+#include <math.h>
 
 // check if file size exceeds available space in buffers
 void check_buffer_space(int* file_size){

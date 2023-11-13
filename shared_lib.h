@@ -14,7 +14,6 @@
 #include <sys/msg.h>
 #include <sys/shm.h>
 #include <fcntl.h>
-#include <math.h>
 #include "semun.h"
 
 #define BUFFER_SIZE 512

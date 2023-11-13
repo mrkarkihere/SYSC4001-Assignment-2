@@ -1,5 +1,9 @@
 {
     "files.associations": {
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "__hash_table": "c",
+        "__node_handle": "c",
+        "functional": "c",
+        "unordered_map": "c"
     }
 }

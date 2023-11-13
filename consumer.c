@@ -1,3 +1,10 @@
+/**
+ * @file consumer.c
+ * @author Arun Karki
+ * @date 2023-11-12
+ * 
+ */
+
 #include "shared_lib.h"
 
 // msg_get() -> returns msgqid

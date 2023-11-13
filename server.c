@@ -1,3 +1,10 @@
+/**
+ * @file server.c
+ * @author Arun Karki
+ * @date 2023-11-12
+ * 
+ */
+
 #include "shared_lib.h"
 #include <time.h>
 #include <sys/stat.h>

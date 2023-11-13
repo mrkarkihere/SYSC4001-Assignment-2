@@ -1,3 +1,9 @@
+/**
+ * @file consumer.c
+ * @author Arun Karki
+ * @date 2023-11-12
+ * 
+ */
 #ifndef SHARED_LIB_H
 #define SHARED_LIB_H
 

@@ -6,4 +6,4 @@ run server first
 run producer second
 run consumer third
 
-blahblhblabha im not doin ts
+gonna clean this up after im done
